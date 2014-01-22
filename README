@@ -1,0 +1,46 @@
+NAME
+    Finance::Bank::Kraken - api.kraken.com connector
+
+VERSION
+    0.1
+
+SYNOPSIS
+     require Finance::Bank::Kraken;
+     $api = new Finance::Bank::Kraken;
+     $api->key($mykrakenkey);
+     $api->secret($mykrakensecret);
+     $result = $api->call(Private, $method, [$arg1, $arg2, ..]);
+
+DESCRIPTION
+    This module allows to connect to the api of the bitcoin market Kraken.
+
+    Please see the Kraken API documentation
+    <https://www.kraken.com/help/api> for a catalog of api methods.
+
+METHODS
+    $api = new Finance::Bank::Kraken
+        The constructor. Returns a "Finance::Bank::Kraken" object.
+
+    $api->key($key)
+        Sets or gets the API key.
+
+    $api->secret($secret)
+        Sets the API secret to $secret or returns the API secret base64
+        decoded.
+
+    $result = $api->call(Public, $method)
+    $result = $api->call(Private, $method)
+    $result = $api->call(Private, $method, [$param1, $param2, ..])
+        Calls the "Public" or "Private" API method $method (with the given
+        $params, where applicable) and returns either undef or a JSON
+        string.
+
+DEPENDENCIES
+    HTTP::Request
+    LWP::UserAgent
+    MIME::Base64
+    Digest::SHA
+
+AUTHOR and COPYRIGHT
+    Copyright Philippe Kueck <projects at unixadm dot org>
+
