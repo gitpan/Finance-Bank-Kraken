@@ -1,7 +1,7 @@
 package Finance::Bank::Kraken;
 
 #
-# $Id: Kraken.pm 2 2014-01-22 15:04:34Z phil $
+# $Id: Kraken.pm 17 2014-02-08 17:04:12Z phil $
 #
 # Kraken API connector
 # author, (c): Philippe Kueck <projects at unixadm dot org>
@@ -18,7 +18,7 @@ use Digest::SHA qw(hmac_sha512_base64 sha256);
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(Private Public);
-our $VERSION = "0.1";
+our $VERSION = "0.2";
 use constant Private => 1;
 use constant Public => 0;
 
@@ -38,7 +38,7 @@ sub call {
 	my $self = shift;
 	my $uripath = sprintf "/0/%s/%s", $_[0]?"private":"public", $_[1];
 	my $req = new HTTP::Request($_[0]?'POST':'GET');
-	my $ua = new LWP::UserAgent('agent' => "Mozilla/5.0 (X11; Linux i686; rv:26.0) Gecko/20100101 Firefox/26.0");
+	my $ua = new LWP::UserAgent('agent' => "perl(Finance::Bank::Kraken) api client/".$VERSION);
 	my $qry = defined $_[2]?(join "&", @{$_[2]}):undef;
 	if ($_[0]) {
 		$req->uri($self->{'uri'} . $uripath);
@@ -53,10 +53,8 @@ sub call {
 		$req->uri(sprintf "%s%s%s", $self->{'uri'}, $uripath, defined $qry?"?$qry":"")
 	}
 	my $res = $ua->request($req);
-	return $res->content if $res->is_success;
-	return
+	$res->is_success?$res->content:undef
 }
-
 
 1;
 
@@ -68,7 +66,7 @@ Finance::Bank::Kraken - api.kraken.com connector
 
 =head1 VERSION
 
-0.1
+0.2
 
 =head1 SYNOPSIS
 

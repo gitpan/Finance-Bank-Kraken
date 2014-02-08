@@ -2,7 +2,7 @@ NAME
     Finance::Bank::Kraken - api.kraken.com connector
 
 VERSION
-    0.1
+    0.2
 
 SYNOPSIS
      require Finance::Bank::Kraken;
