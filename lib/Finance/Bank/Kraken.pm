@@ -1,7 +1,7 @@
 package Finance::Bank::Kraken;
 
 #
-# $Id: Kraken.pm 17 2014-02-08 17:04:12Z phil $
+# $Id: Kraken.pm 72 2014-06-02 11:25:16Z phil $
 #
 # Kraken API connector
 # author, (c): Philippe Kueck <projects at unixadm dot org>
@@ -18,7 +18,7 @@ use Digest::SHA qw(hmac_sha512_base64 sha256);
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(Private Public);
-our $VERSION = "0.2";
+our $VERSION = "0.3";
 use constant Private => 1;
 use constant Public => 0;
 
@@ -53,7 +53,7 @@ sub call {
 		$req->uri(sprintf "%s%s%s", $self->{'uri'}, $uripath, defined $qry?"?$qry":"")
 	}
 	my $res = $ua->request($req);
-	$res->is_success?$res->content:undef
+	$res->is_success?$res->content:$res->status_line
 }
 
 1;
@@ -66,7 +66,7 @@ Finance::Bank::Kraken - api.kraken.com connector
 
 =head1 VERSION
 
-0.2
+0.3
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ Sets the API secret to C<$secret> or returns the API secret base64 decoded.
 
 =item $result = $api->call(Private, $method, [$param1, $param2, ..])
 
-Calls the C<Public> or C<Private> API method C<$method> (with the given C<$params>, where applicable) and returns either undef or a JSON string.
+Calls the C<Public> or C<Private> API method C<$method> (with the given C<$params>, where applicable) and returns either the JSON encoded result string or an error message (C<code> C<message>).
 
 =back
 
@@ -119,6 +119,45 @@ Calls the C<Public> or C<Private> API method C<$method> (with the given C<$param
 =item L<MIME::Base64>
 
 =item L<Digest::SHA>
+
+=back
+
+=head1 EXAMPLES
+
+=head2 get current XLTC market price in EUR
+
+ use Finance::Bank::Kraken;
+ use JSON;
+ 
+ my $kraken = new Finance::Bank::Kraken;
+ my $res = $kraken->call(Public, 'Ticker', ['pair=XLTCZEUR,XXBTZEUR']);
+ printf "1 XLTC is %f EUR\n",
+         from_json($res)->{'result'}->{'XLTCZEUR'}->{'c'}[0]
+         unless $res =~ /^5/;
+
+=head2 get XLTC account balance
+
+ use Finance::Bank::Kraken;
+ use JSON;
+ 
+ my $kraken = new Finance::Bank::Kraken;
+ $kraken->key("mysupersecretkey");
+ $kraken->secret("mysupersecretsecret");
+ my $res = $kraken->call(Private, 'Balance');
+ printf "balance: %f XLTC\n",
+	from_json($res)->{'result'}->{'XLTC'} unless $res =~ /^5/;
+
+=head1 Q&A
+
+=over 8
+
+=item Why does C<call> return a 404?
+
+Probably you misspelled the method. Please check the API documentation and keep in mind the methods are case sensitive.
+
+=item Why does C<call> return a 500?
+
+Maybe there's a problem with the ssl chain of trust. Either install L<Mozilla::CA> or set (one of) the following environment variables C<PERL_LWP_SSL_CA_FILE>, C<HTTPS_CA_FILE>, C<PERL_LWP_SSL_CA_PATH>, C<HTTPS_CA_DIR>. See L<LWP::UserAgent> for details.
 
 =back
 

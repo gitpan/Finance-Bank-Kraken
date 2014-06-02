@@ -1,8 +1,8 @@
-# $Id: kraken.spec 17 2014-02-08 17:04:12Z phil $
+# $Id: kraken.spec 73 2014-06-02 11:25:54Z phil $
 
 %define rname Finance-Bank-Kraken
 Name: perl-%{rname}
-Version: 0.2
+Version: 0.3
 Release: 1%{?dist}
 Summary: an api.kraken.com connector module
 License: LGPL
